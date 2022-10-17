@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "16679567654",
+    "project_id": "auth-flow-rn",
+    "storage_bucket": "auth-flow-rn.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:16679567654:android:5b5c7a7daf1df93be541e7",
+        "android_client_info": {
+          "package_name": "com.loginflowrn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "16679567654-bm6ji4rqf97n88pjs8evtv0uua8e26l7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.loginflowrn",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "16679567654-unet96f4o6q4crhl6e743ucu7tvge2eq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGKs_381Cc_8Sb3qX9pxFPTQ0H3AbVXSU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "16679567654-unet96f4o6q4crhl6e743ucu7tvge2eq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
