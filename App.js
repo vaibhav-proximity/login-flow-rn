@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import {
   GoogleSignin,
   statusCodes,
@@ -34,9 +34,13 @@ const App = () => {
     try {
       console.log('inside loginWithGoogle');
       await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
+      const { user } = await GoogleSignin.signIn();
       console.log('user:', user);
-      setUser(userInfo.user);
+      setUser({
+        email: user.email,
+        name: user.name,
+        image: user.image,
+      });
       setAuthMode(AUTH_MODE.Google);
     } catch (error) {
       console.error('error:', error);
@@ -91,7 +95,11 @@ const App = () => {
     } else {
       const userData = res;
       console.log('fb user:', userData);
-      setUser(userData);
+      setUser({
+        email: userData.email,
+        name: userData.name,
+        image: userData.picture.data.url,
+      });
       setAuthMode(AUTH_MODE.Facebook);
     }
   };
@@ -116,12 +124,12 @@ const App = () => {
     setAuthMode(AUTH_MODE.Not_Authenticated);
   };
 
-  console.log('inside logout', user, authMode);
-
   return (
     <View style={styles.container}>
       {user?.email ? (
         <View>
+          <Image source={user.image} style={styles.user.image} />
+          <Text style={styles.user.name}>Hello {user.name}!</Text>
           <Button onPress={logOut}>
             <Text>Logout</Text>
           </Button>
@@ -159,6 +167,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   buttonText: { color: 'black' },
+  user: {
+    image: { height: 40, width: 40, borderRadius: 20 },
+    name: { fontSize: 20 },
+  },
 });
 
 export default App;
