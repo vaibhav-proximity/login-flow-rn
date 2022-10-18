@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, View } from 'react-native';
 import {
   GoogleSignin,
   statusCodes,
@@ -9,12 +9,11 @@ import {
   GraphRequest,
   GraphRequestManager,
 } from 'react-native-fbsdk';
-
-const Button = ({ children, ...rest }) => (
-  <TouchableOpacity style={styles.button} {...rest}>
-    {children}
-  </TouchableOpacity>
-);
+import auth from '@react-native-firebase/auth';
+import SocialButton from './src/components/SocialButton';
+import Button from './src/components/Button';
+import googleIcon from './src/assets/google.png';
+import facebookIcon from './src/assets/facebook.png';
 
 const AUTH_MODE = {
   Not_Authenticated: 0,
@@ -23,8 +22,15 @@ const AUTH_MODE = {
 };
 
 const App = () => {
+  // social login
   const [user, setUser] = useState({});
   const [authMode, setAuthMode] = useState('');
+
+  // phone auth
+  const [number, setNumber] = useState('');
+  const [confirm, setConfirm] = useState(null);
+  const [code, setCode] = useState('');
+
   // always connect to Google Signin Service
   useEffect(() => {
     GoogleSignin.configure();
@@ -124,24 +130,84 @@ const App = () => {
     setAuthMode(AUTH_MODE.Not_Authenticated);
   };
 
+  // Handle the button press
+  const signInWithPhoneNumber = async () => {
+    console.log('signing in with', number);
+    try {
+      const confirmation = await auth().signInWithPhoneNumber('+91 ' + number);
+      setConfirm(confirmation);
+    } catch (e) {
+      console.error('signining in with phone no error...', e);
+      setConfirm(null);
+    }
+  };
+
+  const confirmCode = async () => {
+    try {
+      await confirm.confirm(code);
+      console.log('logged in with phone no!!!');
+      setUser({
+        name: 'Numbered user',
+        email: 'Mob>> +91' + number,
+        image: '',
+      });
+    } catch (error) {
+      console.log('Invalid code.');
+    }
+  };
+
+  const onAuthStateChanged = cs => {
+    setUser(cs);
+  };
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, []);
+
   return (
     <View style={styles.container}>
       {user?.email ? (
         <View>
           <Image source={user.image} style={styles.user.image} />
           <Text style={styles.user.name}>Hello {user.name}!</Text>
-          <Button onPress={logOut}>
-            <Text>Logout</Text>
-          </Button>
+          <Button text="Logout" onPress={logOut} />
         </View>
       ) : (
         <View>
-          <Button onPress={loginWithGoogle}>
-            <Text style={styles.buttonText}>Login with Google</Text>
-          </Button>
-          <Button onPress={loginWithFacebook}>
-            <Text style={styles.buttonText}>Login with Facebook</Text>
-          </Button>
+          {confirm === null ? (
+            <>
+              <SocialButton
+                icon={googleIcon}
+                text="Google"
+                onPress={loginWithGoogle}
+              />
+              <SocialButton
+                icon={facebookIcon}
+                text="Facebook"
+                onPress={loginWithFacebook}
+              />
+              <TextInput
+                value={number}
+                onChangeText={setNumber}
+                placeholder="phone number"
+                keyboardType="number-pad"
+                style={styles.input}
+              />
+              <Button text="Login" onPress={signInWithPhoneNumber} />
+            </>
+          ) : (
+            <>
+              <TextInput
+                value={code}
+                onChangeText={setCode}
+                placeholder="enter OTP"
+                keyboardType="number-pad"
+                style={styles.input}
+              />
+              <Button text="Proceed" onPress={confirmCode} />
+            </>
+          )}
         </View>
       )}
     </View>
@@ -155,21 +221,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  button: {
-    width: 200,
-    padding: 16,
-    backgroundColor: '#e2e2e2',
-    margin: 8,
-    borderRadius: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    display: 'flex',
-    flexDirection: 'row',
-  },
-  buttonText: { color: 'black' },
   user: {
+    container: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+    },
     image: { height: 40, width: 40, borderRadius: 20 },
     name: { fontSize: 20 },
+  },
+  input: {
+    borderBottomColor: 'black',
   },
 });
 
